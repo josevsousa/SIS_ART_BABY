@@ -1,0 +1,39 @@
+{{extend 'layoutLojinha.html'}}
+
+
+	<h2>Funcionários <small> ( dados de cadastro )</small></h2>
+	<hr>
+	<div class="row">
+		<div class="col-md-6">
+			<ul class="list-group">
+			  <li class="list-group-item"><strong>Nome : </strong> {{=table[0].nome}}</li>
+			  <li class="list-group-item"><strong>Matrícula :</strong>{{=table[0].matricula}}</li>
+			  <li class="list-group-item"><strong>CEP : </strong>{{=table[0].cep}}</li>
+			  <li class="list-group-item"><strong>Tel.( fixo ) : </strong>{{=table[0].fixo}}</li>
+			  <li class="list-group-item"><strong>Celular : </strong> {{=table[0].celular}}</li>
+			  <li class="list-group-item"><strong>E-mail : </strong> {{=table[0].email}}</li>
+			  <li class="list-group-item"><strong>CPF : </strong>{{=table[0].cpf}}</li>
+			  <li class="list-group-item"><strong>Endereço : </strong>{{=table[0].endereco}}</li>
+			  <li class="list-group-item"><strong>Número : </strong>{{=table[0].numero}}</li>
+			  <li class="list-group-item"><strong>Bairro : </strong>{{=table[0].bairro}}</li>
+			  <li class="list-group-item"><strong>Cidade : </strong>{{=table[0].cidade}}</li>
+			  <li class="list-group-item"><strong>UF : </strong>{{=table[0].uf}}</li>
+			</ul>
+			<nav>
+			  <ul class="pager">
+			    <li class="previous"><a href="{{=URL('funcionarios','listarFuncionarios?menu=funcionarios')}}"><span aria-hidden="true">&larr;</span> voltar</a></li>
+			    <!-- <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li> -->
+			  </ul>
+			</nav>
+		</div>
+		<div class="col-md-6" style="text-align:center">
+		{{print table[0].foto_funcionario}}
+	  	{{if table[0].foto_funcionario:}}
+			{{=IMG(_src=URL('default','download',args=table[0].foto_funcionario),_class="img-rounded thumbnail",_width="310px")}}
+	  	{{else:}}
+			{{=IMG(_src=URL('static','images/notImage.png'),_width="400px")}}
+	  	{{pass}}
+		</div>
+	</div>
+  
+

@@ -1,0 +1,209 @@
+{{extend 'layoutLojinha.html'}}
+ <link rel="stylesheet" href="{{=URL('static','jquery-ui-1.11.4.custom/jquery-ui.css')}}">
+ <script src="{{=URL('static','jquery-ui-1.11.4.custom/jquery-ui.js')}}"></script>
+ <script>
+  $(document).ready(function(){
+    $(".w2p_fw spank").hide();
+    $("#codigo").focus();
+    if ($(".web2py_htmltable tr")[0]) {
+      $(".cx").fadeIn(500)
+    };
+   
+    //=======================LISTA ITENS PRODUTO ================================
+      //busca itens no db
+      var lista_NomeCodigo = [
+        {{for item in db(db.produtos.id>0).select('codigo_produto','nome_produto'):}}
+         {codigo:"{{=item.codigo_produto}}",nome:"{{=item.nome_produto}}"},
+        {{pass}}
+      ];
+      //-------------------------- popula codigo
+      var listaCodigoProdutos = [];
+      for(item in lista_NomeCodigo){
+        listaCodigoProdutos.push( lista_NomeCodigo[item].codigo ) 
+      }
+      //autocomplete do codigo
+      $( "#codigo" ).autocomplete({
+        source: listaCodigoProdutos,
+         select: function( event, ui ) {
+          //add nome ao input nome
+          $("#qtde").attr('disabled',false).focus();
+          var x = lista_NomeCodigo.filter(function(item){
+            return item.codigo === ui.item.value;
+          });
+          //add ao campo nome
+          $("#produto").val(x[0].nome);
+        }
+      }).on( "autocompletecreate", function( event, ui ) {} );
+      //libera a tecla addItem
+      $("#qtde").change(function(){
+          $("#addItem").attr('disabled',false).focus();
+      })
+
+      $("#addItem").on('click',function(){
+
+        $(this).text("Registrando...").attr('disabled',true);
+        ajax('addItem',['codigo','qtde','produto']);
+        $(location).attr('href',"produto?menu=caixa");//redireciona a pagina
+      })
+      
+      //------------------------- popula produtos
+      var listaNomeProdutos = [];
+      for(item in lista_NomeCodigo){
+        listaNomeProdutos.push( lista_NomeCodigo[item].nome ) 
+      }
+      //autocomplete do produto
+      $( "#produto" ).autocomplete({
+        source: listaNomeProdutos,
+         select: function( event, ui ) {
+          //add produto ao input produto
+          $("#qtde").attr('disabled',false).focus();
+          var x = lista_NomeCodigo.filter(function(item){
+            return item.nome === ui.item.value;
+          });
+          //add ao campo produto
+          $("#codigo").val(x[0].codigo)
+        }
+      }).on( "autocompletecreate", function( event, ui ) {} )
+      //------------------------- fim popula produtos
+
+    //============== DEL ITEM ===============
+
+    $(".btD button").on('click',function(){
+      var c = confirm("Deletar produto?")
+      if (c == true) {
+        var id = $(this).parent().parent()[0].children[0].textContent; //pega posicao da row
+        var valor_total_Row = $(this).parent().parent()[0].children[4].textContent.replace("R$ ","");//pega valor da celula 4 da row
+        $('#transitory').val(id+";"+valor_total_Row);//envia para o value do input
+        ajax('delItem',['transitory']);
+        $(location).attr('href',"produto?menu=caixa&deleteItem");//chama funcao redirect a
+      }else{
+        console.log("Registro mantido!")
+      };
+      // $(this).parent().parent().hide(400)
+    })
+
+
+  });
+
+ </script>
+<style>
+
+/*SQLFORM.grid*/
+  .web2py_htmltable table tbody tr td,.web2py_htmltable table thead tr th{
+    padding-left: 11px;
+    border-left: 1px solid #DEDEDE;
+  }
+  .web2py_htmltable table tbody tr td:nth-child(1), .web2py_htmltable table thead tr th:nth-child(1){
+    display:none;
+  }
+  .web2py_htmltable table tbody tr td:nth-child(2), .web2py_htmltable table tbody tr td:nth-child(2){
+    width: 73px;
+    }.web2py_htmltable table tbody tr td:nth-child(3), .web2py_htmltable table tbody tr td:nth-child(3){
+    width: 64px;
+  }
+  .web2py_htmltable table tbody tr td.row_buttons{
+    width: 54px;
+    /*background-color: #F2F2F2;*/
+  }
+  .web2py_htmltable table{border: 1px solid #DEDEDE;}
+  .web2py_htmltable{border-radius: 4px; margin-bottom: 11px;
+}
+/*fim do SQLFORM.grid*/
+
+.addItem {
+  margin-bottom: 13px;
+  float: left;
+  padding: 16px 0 0 0;
+  margin-left: 0px !important;
+}
+.addItem input[name="codigo"] {
+    width: 112px;
+}
+.addItem input[name="qtde"] {
+    width: 112px;
+}
+.addItem input, .addItem button {
+    float: left;
+    margin-left: 5px;
+}
+.addItem input[name="produto"] {
+    width: 484px;
+}
+.addItem input, .addItem button {
+    float: left;
+    margin-left: 5px;
+}
+.addItem input, .addItem button {
+    float: left;
+    margin-left: 5px;
+}
+td.JpositionDel {
+    width: 46px;
+}
+
+/*input.form-control.input-lg.total {
+    max-width: 234px;
+    text-align: center;
+    color: chartreuse;
+    font-size: xx-large;
+    background-color: #3F5A3F;
+}*/
+</style>
+<input type="text" name="transitory" id="transitory" style="display:none">
+<div class="tab-content">
+  <ol class="breadcrumb">
+    <li><a href="{{=URL('caixa','cliente?menu=caixa')}}"><span class="badge">1</span> Cliente</a></li>
+    <li class="at"><span class="badge badgeAtivo">2</span> Produto</li>
+    <li style="display:none" class="cx"><a href="{{=URL('caixa','caixa?menu=caixa')}}"><span class="badge">3</span> Caixa</a></li>
+        <li id="codView">COD: <strong>[ codigo venda ]</strong> </li>
+  </ol>
+  <div id="profile">
+    <!-- row -->
+    <div class="row addItem">
+       <input class="form-control input-lg ui-autocomplete-input" id="codigo" name="codigo" type="number" placeholder="codigo" autocomplete="off">
+       <input class="form-control input-lg" id="qtde" name="qtde" type="number" placeholder="qtde" disabled="disabled" autocomplete="off">
+       <input class="form-control  input-lg ui-autocomplete-input" id="produto" name="produto" type="text" placeholder="Produto" autocomplete="off">
+       <button type="button" id="addItem" class="btn btn-success btn-lg" disabled="disabled">Adcionar</button>
+       <!-- <input type="text" class="form-control input-lg total" value="R$ 10,00"> -->
+    </div>
+
+
+    <!-- fim table -->
+    <!-- table -->
+  
+        <!-- table -->
+      <table class="table itemProduto table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Qtde</th>
+            <th>Produto</th>
+            <th>Valor Unid</th>
+            <th>Valor Total</th>
+            <th class="btD"></th>
+          </tr>
+        </thead>
+        <!-- registro -->
+        <tbody id="ttB" class="web2py_htmltable">
+          {{for iten in grid:}}
+          <tr>
+            <td style="display:none">{{=iten.id}}</td>
+            <td>{{=iten.codigoIten}}</td>
+            <td>{{=iten.quantidade}}</td>
+            <td>{{=iten.produto}}</td>
+            <td>{{="R$ %.2f"%float(iten.valorUnidade)}}</td>
+            <td>{{="R$ %.2f"%float(iten.valorTotal)}}</td>
+            <td class="btD">
+              <button type="button" id="delete_item" class="btn btn-default btn-xs cadastroFull">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+              </button>
+            </td>
+          </tr>
+          {{pass}}  
+       </tbody>
+      </table>
+      
+
+  </div><!--fim do profile-->
+</div><!--fim do profile-->
+

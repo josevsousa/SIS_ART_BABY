@@ -1,0 +1,122 @@
+{{extend 'layoutLojinha.html'}}
+
+<script>
+	$(document).ready(function(){
+    	$("#delete_record__row, .w2p_fw span").hide();
+		$('input[type=text]').addClass('form-control ip_text');
+		$('form').addClass('formEditar');
+		// $('.upload').addClass('btn btn-default');
+		$('input[type=submit]').val('Atualizar');
+		$("select").addClass('form-control');
+		// $("tbody tr:nth-child(4)").css('display','none')
+		// $('tr').addClass('tr_div')
+	});
+</script>
+<style>
+	
+	input#clientes_foto_cliente {
+    	margin-top: 8px;
+	}		
+	.formm form table{width: 100%}
+		.titVolt {
+	    display: inline-flex;
+	}
+	.titVolt h3 {
+    	padding: 3px 14px;
+	}
+	hr {
+    	margin-top: 0px;
+	}
+</style>
+<div class="titVolt">
+	<nav>
+	  <ul class="pager">
+	    <li class="previous"><a href="{{=URL('produtos','listarProdutos?menu=produtos')}}"><span aria-hidden="true">&larr;</span> voltar</a></li>
+	    <!-- <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li> -->
+	  </ul>
+	</nav>
+	<h3>Editar produto</h3>
+</div>
+<hr>
+<div class="row">
+	<div class="col-md-6 formm">
+		{{=form}}
+		
+	</div>
+	<div class="col-md-6">
+		
+	</div>
+</div>
+<!-- <form action="#" enctype="multipart/form-data" method="post">
+	<table>
+		<tbody>
+			<tr id="produtos_codigo_produto__row">
+				<td class="w2p_fl">
+					<label for="produtos_codigo_produto" id="produtos_codigo_produto__label">Código: </label>
+				</td>
+				<td class="w2p_fw">
+					<input class="string" id="produtos_codigo_produto" name="codigo_produto" type="text" value="0001">
+				</td>
+				<td class="w2p_fc"></td>
+			</tr>
+			<tr id="produtos_nome_produto__row">
+				<td class="w2p_fl">
+					<label for="produtos_nome_produto" id="produtos_nome_produto__label">Nome: </label>
+				</td>
+				<td class="w2p_fw">
+					<input class="string" id="produtos_nome_produto" name="nome_produto" type="text" value="Sapatinho">
+				</td>
+				<td class="w2p_fc"></td>
+			</tr>
+			<tr id="produtos_preco_produto_lojinha__row">
+				<td class="w2p_fl">
+					<label for="produtos_preco_produto_lojinha" id="produtos_preco_produto_lojinha__label">R$: </label>
+				</td>
+				<td class="w2p_fw">
+					<input class="double" id="produtos_preco_produto_lojinha" name="preco_produto_lojinha" type="text" value="100.00">
+				</td>
+				<td class="w2p_fc"></td>
+			</tr>
+			<tr id="produtos_dataGravado__row">
+				<td class="w2p_fl">
+					<label for="produtos_dataGravado" id="produtos_dataGravado__label">Data: </label>
+				</td>
+				<td class="w2p_fw">
+					<input class="datetime" id="produtos_dataGravado" name="dataGravado" type="text" value="23-09-2015 19:44:37">
+				</td>
+				<td class="w2p_fc"></td>
+			</tr>
+			<tr id="produtos_foto_produto__row">
+				<td class="w2p_fl">
+					<label for="produtos_foto_produto" id="produtos_foto_produto__label">Foto: </label>
+				</td>
+				<td class="w2p_fw">
+					<input class="upload" id="produtos_foto_produto" name="foto_produto" type="file">
+				</td>
+				<td class="w2p_fc"></td>
+			</tr>
+			<tr id="delete_record__row">
+				<td class="w2p_fl">
+					<label for="delete_record" id="delete_record__label">Marque para apagar: </label>
+				</td>
+				<td class="w2p_fw">
+					<input class="delete cascade_delete" id="delete_record" name="delete_this_record" type="checkbox" value="on">
+				</td>
+				<td class="w2p_fc"></td>
+			</tr>
+			<tr id="submit_record__row">
+				<td class="w2p_fl"></td>
+				<td class="w2p_fw">
+					<input type="submit" value="Submit" class="btn btn-default">
+				</td>
+				<td class="w2p_fc"></td>
+			</tr>
+		</tbody>
+	</table>
+	<div style="display:block;">
+		<input name="_next" type="hidden">
+		<input name="id" type="hidden" value="1">
+		<input name="_formkey" type="hidden" value="6c1ce47e2cc46d4022d9f7d08fc6b8df:02d44134-8e6b-4125-8eb4-4172ec3a0736">
+		<input name="_formname" type="hidden" value="produtos/1">
+	</div>
+</form> -->

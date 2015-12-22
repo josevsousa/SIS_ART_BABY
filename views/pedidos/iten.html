@@ -1,0 +1,129 @@
+{{extend 'layoutLojinha.html'}}
+<script>
+	$(document).ready(function(){
+
+		$('#check div').on('click',function(){
+			statusAtual = $(this).attr('class');//status do check 
+			cod  = $(this).parent().parent().children()[0];//id do row do check
+			cod = cod.textContent;
+			if (statusAtual == "check_True") {
+				//mudar par check_False
+				$(this).removeClass('check_True').addClass('check_False');
+				//passar o False para o Itens.status
+				updateStatus(cod,'False');
+			}else{
+				//mudar para check_True
+				$(this).removeClass('check_False').addClass('check_True');
+				//passar o True para o Itens.status
+				updateStatus(cod,'True');
+			};
+		});
+
+		$('.obs_iten input').on('keyup',function(){
+			id  = $(this).parent().parent().children()[0];//id do row do check
+			id = id.textContent;
+			$('#transitory').val(id+";"+($(this).val()));
+			ajax('update_ItenObs',['transitory'])
+		})
+
+		//update Itens.status
+		function updateStatus(id,status){
+			$('#transitory').val(id+";"+status+";"+{{=cod}});
+			ajax('update_ItenStatus',['transitory'])
+		}
+
+  	});
+</script>
+<style>
+	hr {
+    	margin-top: 0px;
+	}
+	.titVolt {
+	    display: inline-flex;
+	}
+	.titVolt h3 {
+    	padding: 3px 14px;
+	}
+	td {
+	    border: 1px solid #ccc;
+	    padding: 5px;
+	}
+	td:nth-child(1){
+		width: 8%;
+	}
+	td:nth-child(1), td:nth-child(3),td:nth-child(4){
+		text-align: center;
+	}
+	th{
+		text-align: center;
+	}
+
+	#check{
+		padding: 3px;		
+	}
+	#check div{
+		width: 25px;
+    	height: 29px;
+    	cursor:pointer;
+    	margin:0 auto;
+    	margin-top: 4px;
+	}
+	#check div.check_False{
+		background:url('{{=URL('static','images/checkBOX.png')}}') center 4px no-repeat;   
+	}
+	#check div.check_True{
+		background:url('{{=URL('static','images/checkBOX.png')}}') center -20px no-repeat;                               
+	}
+	.obs_iten{
+		padding: 2px !important;
+	}
+	.obs_iten input{
+		margin: 0 auto;
+		width: 95%;
+	}
+
+</style>
+
+<input type="text" id="transitory" name="transitory" style="display:none">
+<div class="animated fadeIn">
+	<div class="titVolt">
+		<nav>
+		  <ul class="pager">
+		    <li class="previous"><a href="{{=URL('pedidos','abertos?menu=operacional')}}"><span aria-hidden="true">&larr;</span> voltar</a></li>
+		    <!-- <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li> -->
+		  </ul>
+		</nav>
+		{{=head}}
+	</div>
+	<hr>
+<!-- AQUI A TABELA DE ITENS DO SQLFORM.grid -->
+
+<div id="minhaTabela" class="container" >
+	<h3>Lista de pedidos para separar</h3>
+	<table id="dataTable" class="table table-striped hover" cellspacing="0" width="100%" >
+		<thead>
+			<tr>
+				<th>Codigo</th>
+				<th>Peça</th>
+				<th>Qtde</th>
+				<th>Status</th>
+				<th>Obs</th>
+			</tr>
+			<tbody>
+				{{for iten in grid:}}
+					<!-- pegar a data da solicitacao -->
+						<tr>
+							<td style="display:none">{{=iten.id}}</td>
+							<td>{{=iten.codigoIten}}</td>
+							<td>{{=iten.produto}}</td>
+							<td>{{=iten.quantidade}}</td>
+							<td id="check"><div class="{{='check_%s'%iten.status}}"></div></td>
+							<td class="obs_iten"><input type="text" class="form-control" value="{{=iten.obs}}"></td>
+						</tr>
+					
+				{{pass}}
+			</tbody>
+		</thead>
+	</table>
+</div>
+</div>

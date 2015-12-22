@@ -1,0 +1,72 @@
+{{extend 'layoutLojinha.html'}}
+
+
+
+<script>
+	$(document).ready(function(){
+	    // $('#minhaTabela table').attr('id', 'dataTable').addClass('display');
+	    $('#dataTable').DataTable({
+	        "scrollX": true,
+	        "language": {
+	          "url": "{{=URL('static','js/tradutorTable.json')}}"
+	        } 
+	    });
+	    $('.fechar').on('click',function(){
+	    		var x = $(this).attr('id');
+	    		var c = confirm("Deseja mesmo apagar?");
+	    		if (c == true) {
+		    	 	//--
+		    		$("input[name=cod]").val(x);
+		    		ajax('deletar',['cod']); //chamar a funcao para apagar no banco
+		    		 //$(this).parent().parent().parent().hide(400) //esconder a 
+	    		 	location.reload();
+	    		}else{
+	    			console.log("Nao apagado")
+	    		};
+	    });
+
+
+
+
+	})
+</script>
+<style type="text/css">
+	td.opcoes {width: 120px !important;}
+/*	td#opcoes div{float: right;}
+	td#opcoes div button{margin-right: 0px !important}
+	.idS {display:none !important;}
+*/	.JpositionA{float: right;}
+	.JpositionA a{margin-right: 0px !important;}
+
+</style>
+
+
+
+<input type="text"  name='cod' style="display:none">
+<div id="minhaTabela" class="animated fadeInDown">
+		<a class="btn btn-default" href="/{{=request.application}}/funcionarios/cadastrarFuncionarios?menu=funcionarios"><span class="glyphicon glyphicon-plus"></span> Novo Funcionário</a>
+	
+	<hr>
+	<table id="dataTable" class="table table-striped hover" cellspacing="0" width="100%" >
+		<thead>
+			<tr>
+				<th>Matrícula</th>
+				<th>Nome do Funcionário</th>
+				<th>Celular</th>
+				<th>Email</th>
+				<th></th>
+			</tr>
+			<tbody>
+			{{for funcionario in formListar:}}
+			<tr>	
+				<td>{{=funcionario.funcionarios.matricula}}</td>
+				<td>{{=funcionario.funcionarios.nome}}</td>
+				<td>{{=funcionario.funcionarios.celular}} : {{=funcionario.funcionarios.operadora}}</td>
+				<td>{{=funcionario.funcionarios.email}}</td>
+				<td class="opcoes">{{=funcionario.campos_virtual.botoes}}</td>
+			</tr>
+			{{pass}}		
+			</tbody>
+		</thead>
+	</table>
+</div>

@@ -1,0 +1,263 @@
+{{extend 'layoutLojinha.html'}}
+<link rel="stylesheet" href="{{=URL('static','jquery-ui-1.11.4.custom/jquery-ui.css')}}">
+<script src="{{=URL('static','jquery-ui-1.11.4.custom/jquery-ui.js')}}"></script>
+
+
+<script>
+  $(document).ready(function(){
+      $('#codigo').focus();
+      //=========== DATATABLE ================ 
+        // $('#minhaTabela table').attr('id', 'dataTable').addClass('display');
+        $('#minhaTabela').DataTable({
+            "scrollX": true,
+            "order": [ 0, 'desc' ],
+            "language": {
+              "url": "{{=URL('static','js/tradutorTable.json')}}"
+            },
+            "columnDefs": [
+              {
+                  "targets": [ 0 ],
+                  "searchable": false
+              },
+              {
+                  "targets": [ 1 ],
+                  "searchable": false
+              }
+              
+            ]
+            
+        });   
+      //=========== FIM DATATABLE ================
+
+      //=======================LISTA ITENS PRODUTO ================================
+      //busca itens no db
+      var lista_NomeCodigo = [
+        {{for item in db(db.produtos.id>0).select('codigo_produto','nome_produto'):}}
+         {codigo:"{{=item.codigo_produto}}",nome:"{{=item.nome_produto}}"},
+        {{pass}}
+      ];
+      //-------------------------- popula codigo
+          var listaCodigoProdutos = [];
+          for(item in lista_NomeCodigo){
+            listaCodigoProdutos.push( lista_NomeCodigo[item].codigo ) 
+          }
+          //autocomplete do codigo
+          $( "#codigo" ).autocomplete({
+            source: listaCodigoProdutos,
+             select: function( event, ui ) {
+              //add nome ao input nome
+              $("#qtde").attr('disabled',false).focus();
+              var x = lista_NomeCodigo.filter(function(item){
+                return item.codigo === ui.item.value;
+              });
+              //add ao campo nome
+              $("#produto").val(x[0].nome);
+            }
+          }).on( "autocompletecreate", function( event, ui ) {} );
+          //libera a tecla addItem
+          $("#qtde").change(function(){
+              $("#addItem").attr('disabled',false).focus();
+          })
+
+          $("#addItem").on('click',function(){
+            $(this).text("Registr...").attr('disabled',true);
+            ajax('produto',['codigo','qtde','produto'],location.reload());
+          })
+      //------------------------- fim popula codigo    
+      
+      //------------------------- popula produtos
+      var listaNomeProdutos = [];
+      for(item in lista_NomeCodigo){
+        listaNomeProdutos.push( lista_NomeCodigo[item].nome ) 
+      }
+      //autocomplete do produto
+      $( "#produto" ).autocomplete({
+        source: listaNomeProdutos,
+         select: function( event, ui ) {
+          //add produto ao input produto
+          $("#qtde").attr('disabled',false).focus();
+          var x = lista_NomeCodigo.filter(function(item){
+            return item.nome === ui.item.value;
+          });
+          //add ao campo produto
+          $("#codigo").val(x[0].codigo)
+        }
+      }).on( "autocompletecreate", function( event, ui ) {} )
+      //------------------------- fim popula produtos
+
+
+      // botao deletar item
+      // $(".JpositionDel .fechar").on('click',function(){
+      //   $(this).parent().parent().parent().hide(400)
+      // });
+    //=======================LISTA ITENS================================
+  
+    // deleta item
+    $(".del").on('click',function(){
+        var c = confirm("Tem certeza que deseja cancelar a venda???")
+        if (c == true) {
+            cod = $(this).parent().parent().children()[0].textContent; 
+            $('#transitory').val(cod); 
+            ajax('delItem',['transitory']);
+            $(location).attr('href',"etapa_2?menu=caixa");//redireciona a pagina
+        }
+    });
+
+
+  });//fim do jquary.document
+</script>
+<style>
+  /*-- thema form_etapa*/
+ .contage{
+    font-size: x-large;
+    border-radius: 22px;
+    background: beige;
+  }
+  .contageP {
+    font-size: 12px;
+    border-radius: 22px;
+    background: #E6E67C;
+  }
+  .cor_Contage_ok{ 
+    background: #2DEC2A !important;
+  }
+  .cor_Contage_Edit{ 
+    background: #FFBC00 !important;
+  }
+  .fluxoVenda{
+    width: 143px;
+    float: left;
+    margin: 9px 20px;
+  }
+  .row blockquote{
+    float: left; 
+  }
+  .row_borda_bottom{
+    border-bottom: 1px solid #E8E8E8;
+  }
+  .col-md-4{
+     padding: 11px 0px;
+  }
+
+  a, a:link, a:hover {
+    text-decoration: none;
+  }
+  /*--grid--*/
+/*  #minhaTabela thead tr th:nth-child(6), #minhaTabela tbody tr td:nth-child(6){
+    width: 45px !important;  }
+  #minhaTabela thead tr th:nth-child(5), #minhaTabela tbody tr td:nth-child(5){
+    width: 115px !important;  }
+  #minhaTabela thead tr th:nth-child(4), #minhaTabela tbody tr td:nth-child(4){
+    width: 115px !important;  }
+  #minhaTabela thead tr th:nth-child(1), #minhaTabela tbody tr td:nth-child(1){
+    width: 75px !important;  }
+  #minhaTabela thead tr th:nth-child(2), #minhaTabela tbody tr td:nth-child(2){
+    width: 50px !important;  }*/
+  
+  /*--fim grid--*/
+
+  .addItem{padding: 17px;}
+  .addItem input, .addItem button{ 
+    float:left;margin-left: 3px;
+    margin: 0px 3px 2px 2px;
+  }
+  #codigo{
+    width: 105px;
+  }
+  #qtde{
+    width: 100px;
+  }
+  #produto{
+    width: 500px;
+  }
+  .highlight{
+    padding: 16px 15px 22px 16px;
+  }
+  .highlight a{
+    width: 100%;
+  }
+  .highlight a:hover{
+        background: #FDFDFD;
+    border-color: #E1E1E8;
+  }
+  .highlight div.t{
+    padding: 9px 14px;
+    margin-bottom: 2px;
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+    border-radius: 4px;
+    width: 100%;
+    float: left;
+    font-size: 19px;
+    text-align: center;
+  }
+</style>
+<input type="text" id="transitory" name="transitory" style='display:none'>
+<div class="container animated fadeIn">
+  <div class="row row_borda_bottom"> 
+    <div class="fluxoVenda">
+    <a href="etapa_1?menu=caixa">
+      <span class="label contage cor_Contage_ok">1</span>
+    </a>
+      <span class="label contage cor_Contage_Edit">2</span>
+      <span class="label contage">3</span>
+    </div>
+    <blockquote>
+      <p class="lead">Você esta no (2) de (3) passos para fechar a venda. {{=XML(" | Código: <kbd>%s</kbd>"%session.codigo_venda)}}</p>
+    </blockquote>
+  </div>
+  <div class="row">
+    <div class="col-md-9">
+           <!-- row -->
+        <div class="row addItem">
+           <input class="form-control input-lg ui-autocomplete-input" id="codigo" name="codigo" type="number" placeholder="codigo" autocomplete="off">
+           <input class="form-control input-lg" id="qtde" name="qtde" type="number" placeholder="qtde" disabled="disabled" autocomplete="off">
+           <input class="form-control  input-lg ui-autocomplete-input" id="produto" name="produto" type="text" placeholder="Produto" autocomplete="off">
+           <button type="button" id="addItem" class="btn btn-success btn-lg" disabled="disabled">Adcionar</button>
+           
+        </div>
+    </div>
+    <div class="col-md-3 highlight">
+      <div class="t"><b>Total:</b> {{=sTotal}}</div>
+      <a href="etapa_3?menu=caixa&sTotal={{=sTotal}}" class="btn btn-default" type="submit" value="Próximo">Próximo <span class="label contageP">3</span></a>
+    </div>
+  </div>
+  <div class="row ">
+    <div class="col-md-12" id='grid'>
+    <!-- table -->
+      <table id="minhaTabela" class="table table-striped hover " cellspacing="0" width="100%" >
+      <thead>
+        <tr>
+          <th style='display:none'>-</th>
+          <th style='display:none'>-</th>
+          <th>Codigo</th>
+          <th>Qtde</th>
+          <th>Produto</th>
+          <th>Valor Unid</th>
+          <th>Valor Total</th>
+          <th></th>
+        </tr> 
+        <tbody>
+          {{for iten in grid:}}
+              <tr>
+                <td style='display:none'>{{="%s"%iten.id}}</td>
+                <td style='display:none'>{{="%s"%iten.dataRegistro}}</td>
+                <td>{{=iten.codigoIten}}</td>
+                <td>{{=iten.quantidade}}</td>
+                <td>{{=iten.produto}}</td>
+                <td>{{="R$ %.2f"%float(iten.valorUnidade)}}</td>
+                <td>{{="R$ %.2f"%float(iten.valorTotal)}}</td>
+                <td class="btDD"><a class="btn btn-default del btn-xs" href="#"><span class="glyphicon glyphicon-trash"></span></a></td>
+              </tr>
+          {{pass}}  
+        </tbody>
+      </thead>
+      </table>    
+    </div>
+  </div>
+
+</div>
+
+
+
+ 

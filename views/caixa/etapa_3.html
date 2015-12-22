@@ -1,0 +1,349 @@
+{{extend 'layoutLojinha.html'}}
+<script>
+$(document).ready(function(){
+	    $("#btFecharCaixa").on('click',function(){
+	      $(this).text("Enviando e-mail...").attr('disabled',true);
+	      var tipoVenda = $('.tpv').prop('value');
+	      var valorTotal = $('#subTotal').text().replace('R$','').trim();
+	      var desconto = $('.vermelho').text().replace('R$','').trim();
+	      var representante = "{{=session.representante}}";
+	      var codigo_venda = "{{=session.codigo_venda}}"
+	      
+	      var enviarEmail = 'N';//buscar estado do check do checkbox enviar email
+
+	      $("#transitory").val(tipoVenda+";"+valorTotal+";"+desconto+";"+representante+";"+enviarEmail);
+	      ajax('fecharVenda',['transitory']);
+		  $(location).attr('href',"historico?menu=caixa");//redireciona a pagina
+	    });	
+
+		$("#btCancelarCaixa").on('click',function(){
+	        var c = confirm("Tem certeza que deseja cancelar a venda???")
+	        if (c == true) {
+	          ajax('cancelarVenda',['transitory']);
+	          $(location).attr('href',"etapa_1?menu=caixa");//redireciona a pagina
+	        }else{
+	          console.log("Venda mantida!")
+	        };
+	    });
+
+	    //select tipo venda
+	    $('.tpv').on('change',function(){
+	      var valor = $(this).val();
+	      if (valor == "aVista"){
+	        $("#din, #por, #btFecharCaixa").attr('disabled',false);
+	        $(".d").show(400);
+	        parcelar(false);
+	        $('#comprovantePagSeg').hide(400);
+	        $('#parcelado').hide(400)
+	      }else if(valor == "credito" || valor == "debito" ){
+	        $('#comprovantePagSeg').show(400);
+	        zerarDesconto();
+	        $("#btFecharCaixa").attr('disabled',false);
+	        $("#calcDesc").hide(400);
+	        $(".d").hide(400);
+	        parcelar(false);
+	      }else if(valor == "cheque" || valor == "boleto" ){
+	        $("#din, #por, #btFecharCaixa").attr('disabled',false);
+	        $(".d").show(400);
+	        parcelar(true);
+	        $('#comprovantePagSeg').hide(400)
+	      }else{
+	        zerarDesconto();
+	        parcelar(false);
+	        $("#btFecharCaixa").removeClass('btF');
+	        $("#btFecharCaixa").attr('disabled',true);
+	        $("#calcDesc").hide(400);
+	        $(".d").hide(400);
+	        $('#comprovantePagSeg').hide(400)
+
+	      }
+	    }); 
+		
+	    var totall = parseFloat($("#subTotal").text().replace('R$','').trim());
+	    // din
+	    $("#din").on('keyup',function(){
+	      var d = $(this).val(); //dinheiro
+	      var p = $('#por').val();//porcentage
+	      if (p == '' && d == '') {
+	        vizor(d,p);
+	        $("#calcDesc").hide(400);//esconder
+	        $('#subTotal').text($(".verde").text());
+	        var porcC = $('.parcelarC').val();
+	        if (porcC != '0' && porcC != '') {
+	          gerarGridParcela(porcC,parseFloat($("#subTotal").text().replace('R$','').trim()))   
+	        };
+	      }else{
+	        vizor(d,p);
+	        var porcC = $('.parcelarC').val();
+	        if (porcC != '0' && porcC != '') {
+	          gerarGridParcela(porcC,parseFloat($("#subTotal").text().replace('R$','').trim()))
+	        }else{
+
+	        };
+	      };
+	    });//fim din
+	    //por
+	    $("#por").on('keyup',function(){
+	      var p = $(this).val();
+	      var d = $('#din').val();
+	      if (p == '' && d == '') {
+	        vizor(d,p);
+	        $("#calcDesc").hide(400);//esconder
+	        $('#subTotal').text($(".verde").text());
+	        var porcC = $('.parcelarC').val();
+	        if (porcC != '0' && porcC != '') {
+	          gerarGridParcela(porcC,parseFloat($("#subTotal").text().replace('R$','').trim()))   
+	        };
+	      }else{
+	        vizor(d,p);
+	        var porcC = $('.parcelarC').val();
+	        if (porcC != '0' && porcC != '') {
+	          gerarGridParcela(porcC,parseFloat($("#subTotal").text().replace('R$','').trim()))
+	        }else{
+
+	        };
+	      };
+    	});//fim por 
+  function vizor(din, por){
+      if (din == '' && por == '') {
+	        $("#calcDesc").hide(400);//esconder
+	        $('#subTotal').text($(".verde").text());
+	        $('.vermelho').text('R$ 0.00')
+      	}else{
+	        if (din == "") {
+	          din = "0"
+	        }else if(por == "") {
+	          	por = "0"
+	        };
+	        var desc_din = parseFloat(din);
+	        var desc_porcentage = parseFloat(por);
+	        var desconto = (totall - (desc_din+((totall*desc_porcentage)/100)));
+	        var viewCalc = 'Total ( <span class="verde">R$ '+
+	              totall.toFixed(2)+'</span> ) <b>-</b> Desconto ( <span class="vermelho"> R$ '+
+	              parseFloat(totall - desconto).toFixed(2)+
+	              '</span> )';
+	        $('#subTotal').text("R$ "+desconto.toFixed(2)) //SUBTOTAL
+	        $("#calcDesc").html(viewCalc);
+	        $("#calcDesc").show(400);//mostrar
+      	}
+    }//fim vizor
+   
+   
+        // ---- parcelar compra ------
+    function parcelar(e){
+      if(e == true){
+        $('.p').show(400);
+
+      }else{
+        $('.p').hide(400)
+        $('.parcelarC').prop('selectedIndex',0);
+      }
+    }
+    $('.parcelarC').on('change', function(){
+      var p = $(this).val(); 
+      if (p != '' && p != '0' ) {
+        gerarGridParcela(p,parseFloat($("#subTotal").text().replace('R$','').trim())); 
+        $('#parcelado').show(400); 
+      }else if(p == '0'){
+        $('#parcelado').hide(400); 
+      }; 
+        
+    });   
+    function gerarGridParcela(n, total){
+      var tipoVenda = $('.tpv').prop('value');
+      $("#transitory").val(n+";"+total+";"+tipoVenda);
+      ajax('parcelado',['transitory'],'parcelado');
+    }
+    function zerarDesconto(){
+      var vv = $(".verde").text();
+      if (vv != '') {
+        $('#subTotal').text(vv);
+      };
+      $("#din, #por").val('');
+      $(".vermelho").text('0');
+    }    
+    // ---- fim parcelar compra ------
+
+});//ready
+</script>
+<style>
+
+	span#d {
+	    color: red;
+	}
+	span.verde {
+	    color: #008600;
+	}
+	span.vermelho {
+	    color: #E81D1D;
+	}
+	 /*-- thema form_etapa*/
+ .contage{
+    font-size: x-large;
+    border-radius: 22px;
+    background: beige;
+  }
+  .contageP {
+    font-size: 12px;
+    border-radius: 22px;
+    background: #E6E67C;
+  }
+  .cor_Contage_ok{ 
+    background: #2DEC2A !important;
+  }
+  .cor_Contage_Edit{ 
+    background: #FFBC00 !important;
+  }
+  .fluxoVenda{
+    width: 143px;
+    float: left;
+    margin: 9px 20px;
+  }
+  .row blockquote{
+    float: left; 
+  }
+  .row_borda_bottom{
+    border-bottom: 1px solid #E8E8E8;
+  }
+  .col-md-4{
+     padding: 11px 0px;
+  }
+
+  a, a:link, a:hover {
+    text-decoration: none;
+  }
+  /*caixa*/
+    div#subTotal {
+    	font-size: -webkit-xxx-large;
+    	text-align: center;
+    	padding: 0px 15px !important;
+    }
+	div#ret {
+	    padding: 35px 0px;
+	    display: -webkit-box;
+	}
+	div#enviarEmail {
+    	width: 147px;
+	}
+
+	div#calcDesc {
+	    padding: 5px 0px 0px 10px;
+	}
+	.form-group.desc {
+    	display: flex;
+	}
+
+</style>
+<input type="text" id="transitory" name="transitory" style='display:none'>
+<div class="container animated fadeIn">
+  <div class="row row_borda_bottom"> 
+    <div class="fluxoVenda">
+    <a href="etapa_1?menu=caixa">
+      <span class="label contage cor_Contage_ok">1</span>
+    </a>
+    <a href="etapa_2?menu=caixa">
+      <span class="label contage cor_Contage_ok">2</span>
+    </a>  
+      <span class="label contage cor_Contage_Edit">3</span>
+    </div>
+    <blockquote>
+      <p class="lead">Você esta no (3) de (3) finalize a venda. {{=XML(" | Código: <kbd>%s</kbd>"%session.codigo_venda)}}</p>
+    </blockquote>
+  </div>
+  <div class="venda">
+		<div id="ret">
+		  
+		  <div class="col-md-6 fVenda">
+		    <div>
+		      <label>Tipo venda!</label>
+		      <div class="form-group">
+		        <select class="form-control tpv">
+		          <option value="0"></option>
+		          <option value="aVista">A vista</option>
+		          <option value="credito">Crédito</option>
+		          <option value="debito">Débito</option>   
+		          <option value="cheque">Cheque</option>  
+		          <option value="boleto">Boleto</option>           
+		        </select>
+		      </div>
+		    </div> 
+		    
+		    <div class="d" style="display:none">
+		      <label>Desconto!</label>
+		      <div class="form-group desc">
+		        <div class="roww">
+		          <div class="col-md-6">
+		            <div class="input-group">
+		              <span class="input-group-addon" id="basic-addon1"><b>$</b></span>
+		              <input type="number" class="form-control" id="din" aria-describedby="basic-addon1">
+		            </div>
+
+		          </div>
+		          <div class="col-md-6">
+		            <div class="input-group">
+		              <span class="input-group-addon" id="basic-addon2"><b>%</b></span>
+		              <input type="number" class="form-control" id="por" aria-describedby="basic-addon1">
+		            </div>
+		          </div>
+		        </div>        
+		      </div>
+		      <!--input parcelar-->
+		      <div class="p" style="display:none">
+		          <label>Parcelas: </label>
+		          <div class="form-group">
+		            <select class="form-control parcelarC">
+		              <option value="0">0</option>
+		              <option value="1">1</option>
+		              <option value="2">2</option>
+		              <option value="3">3</option>
+		              <option value="4">4</option>         
+		            </select>
+		          </div> 
+		      </div><!--fim do input parcelar--> 
+		      <div id="parcelado">
+	<!-- 	        <table class="table table-striped hover  no-footer">
+		          <thead>
+		            <th>Parc</th>
+		            <th>Data</th>
+		            <th>Valor</th>
+		          </thead>
+		          <tbody>
+		            <tr>
+		              <td>jose</td>
+		              <td>sousa</td>
+		              <td>sousa</td>
+		            </tr>
+		            <tr>
+		              <td>jose</td>
+		              <td>sousa</td>
+		              <td>sousa</td>
+		            </tr>
+		          </tbody>
+		        </table>
+ -->		        
+		      </div>
+
+		    </div> 
+		    <h2 id="comprovantePagSeg" style="display:none"><b>Cel.:</b> <span> (83) 9992-0746</span></h2> 
+		  </div>
+		  <div class="col-md-6 cfr">
+		    <div class="panel panel-default">
+		        <div id="calcDesc" style="display: none;"></div>
+		        <div id="subTotal" class="panel-body">
+		          {{=request.vars.sTotal}}		      
+		        </div>
+		    </div>
+		      <button type="button" id="btFecharCaixa" class="btn btn-default" disabled="disabled"><span class="glyphicon glyphicon-ok-circle"></span> Fechar caixa</button>
+		      <div class="col-md-3" id="enviarEmail">
+		        <div class="checkbox">
+		          <!-- enviar email? -->
+		          <label>
+		            <input id="e_email" name="e_email" type="checkbox">Enviar e-mail!
+		          </label>
+		        </div>
+		      </div>
+		      <button type="button" id="btCancelarCaixa" class="btn btn-danger"> <span class="glyphicon glyphicon-remove-circle"></span> Cancelar venda</button>
+		  </div>
+	</div>  
+</div>
+</div><!--fim container-->  

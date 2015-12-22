@@ -1,0 +1,75 @@
+{{extend 'layoutLojinha.html'}}
+
+<script>
+	$(document).ready(function(){
+            // $('#minhaTabela table').attr('id', 'dataTable').addClass('display');
+            $('#dataTable').DataTable({
+	            "scrollX": true,
+	            "language": {
+	              "url": "{{=URL('static','js/tradutorTable.json')}}"
+	            } 
+		    });
+		    $('.fechar').on('click',function(){
+		    	
+		    		var td = $(this).parent().parent().parent().children()[0];
+		    		var x = td.textContent;
+		    		var c = confirm("Deseja mesmo apagar?");
+		    		if (c == true) {
+		    			//--
+		    			$("input[name=cod]").val(x);
+		    			ajax('deletar',['cod']); //chamar a funcao para apagar no banco
+		    			// $(this).parent().parent().parent().hide(400) //esconder a 
+		    			location.reload();
+		    		}else{
+		    			console.log("Nao apagado")
+		    		};
+		    })
+	})
+
+</script>
+<style type="text/css">
+	td.opcoes {width: 120px !important;}
+/*	td#opcoes {width: 201px;}
+	td#opcoes div{float: right;}
+	td#opcoes div button{margin-right: 0px !important}
+	.idS {display:none !important;}
+*/	.JpositionA{float: right;}
+	.JpositionA a{margin-right: 0px !important}
+	#cod{display:none;}
+
+
+</style>
+
+<input type="text" id="cod" name="cod">
+<div id="minhaTabela" class="container animated fadeInDown">
+
+{{if auth.has_membership('admin'):}}
+	<a class="btn btn-default" href="/{{=request.application}}/representantes/cadastrarRepresentantes?menu=representantes"><span class="glyphicon glyphicon-plus"></span> Novo Representante</a>
+{{else:}}
+	<a class="btn btn-default" disabled="disabled" href="#"><span class="glyphicon glyphicon-plus"></span> Novo representante</a>
+{{pass}}
+
+
+<hr>
+<table id="dataTable" class="table table-striped hover" cellspacing="0" width="100%" >
+<thead>
+	<tr>
+		<th>Nome</th>
+		<th>Celular</th>
+		<th>Email</th>
+		<th></th>
+	</tr> 
+	<tbody>
+		{{for representante in formListar:}}
+			<tr>
+				<td>{{=representante.representantes.nome}}</td>
+				<td>{{=representante.representantes.celular}}</td>
+				<td>{{=representante.representantes.email}}</td>
+				<td class="opcoes">{{=representante.campos_virtual.botoes}}</td>
+			</tr>
+		{{pass}}		
+	</tbody>
+</thead>
+</table>
+
+</div>

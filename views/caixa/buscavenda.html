@@ -1,0 +1,96 @@
+{{extend 'layoutLojinha.html'}}
+
+
+<style>
+@media only print
+{
+  /*  body * { display: none !important; }
+    body:after { content: "Don't waste paper!"; }*/
+    .btPrint, #nav_home, .btVolt, .alert-dismissable, .footer, #socialdrawer {display:none !important;}
+    .logoP {display:block !important;} 
+    .end{display:block !important;}
+    td, th{
+		padding: 2px 8px !important;
+	}
+
+	}
+	#parcelado{
+		width: 360px;
+	}
+
+
+</style>
+
+
+	{{=historico_venda[0].valorDesconto}}
+
+
+
+<div class='animated fadeIn'>
+	<div style='text-align:center;display:none' class='logoP'>
+		<img src='../static/images/logoPrint.png' width='95pt'><hr>
+	</div>
+	<h3>Recibo ArtesanalBaby ( codigo : {{=historico_venda[0].codigoVenda}} )</h3><br>		
+	<div id='retornoCliente'>
+		<ul class='list-group'>
+			<li class='list-group-item'><strong>Cliente: </strong><span id='nn'>{{=historico_venda[0].clienteEmail}} </span></li>
+		</ul>
+	</div>
+	<!-- itens -->
+	<div class='table-responsive'>
+		<table class='table table-bordered table-striped'>
+			<thead>
+				<tr>
+					<th>Código</th>
+					<th>Qtde</th>
+					<th>Produto</th>
+					<th>Valor Unidade</th>
+					<th>Valor Total</th>
+				</tr>
+			</thead>
+			<tbody id='bodyPrint'>
+				{{for iten in itens_venda:}}
+					<tr>
+						<td>{{=iten.codigoIten}}</td>
+						<td>{{=iten.quantidade}}</td>
+						<td>{{=iten.produto}}</td>
+						<td>{{="R$ %.2f"%float(iten.valorUnidade)}}</td>
+						<td>{{="R$ %.2f"%float(iten.valorTotal)}}</td>
+					</tr>
+				{{pass}}
+			</tbody>
+		</table>
+		<h3>S-Total = {{="R$ %.2f"%float(historico_venda[0].valorVenda)}} | Tipo pag : {{=historico_venda[0].tipoVenda}} </h3> 
+	</div>
+	
+	{{if itens_parcelas != "":}}
+		
+		<!-- parcelas -->
+		<div id='parcelado'>
+			<table class='table table-striped table-bordered'>
+				<thead>
+					<th>Parc</th>
+					<th>Data</th>
+					<th>Valor</th>	
+				</thead>
+				<tbody>
+				{{for iten in itens_parcelas:}}
+					<tr>
+						<td>{{=iten.parcela}}</td> 
+						<td>{{=(iten.dataVencimento).strftime("%d/%m/%Y")}}</td> 
+						<td>{{="R$ %.2f"%float(iten.valor)}}</td> 
+					</tr>
+				{{pass}}	
+				</tbody>
+			</table>
+		</div>	
+	{{pass}}
+	<hr>
+	<a href='historico?menu=caixa' class='btn btn-default btVolt'>Voltar</a>
+	<a href='javascript:window.print()' class='btn btn-info btPrint'>imprimir</a>
+	</div>
+	<div class='end' style='display:none'><h4>www.artesanalbaby.com.br</h4></div>
+	<br>
+	
+
+

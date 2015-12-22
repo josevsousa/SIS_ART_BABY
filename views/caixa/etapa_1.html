@@ -1,0 +1,81 @@
+{{extend 'layoutLojinha.html'}}
+<link rel="stylesheet" href="{{=URL('static','jquery-ui-1.11.4.custom/jquery-ui.css')}}">
+<script src="{{=URL('static','jquery-ui-1.11.4.custom/jquery-ui.js')}}"></script>
+<script>
+  $(document).ready(function(){
+    // thema form
+    $('#no_table_Cliente').addClass('form-control');
+    $('.form_etapa-1 form input[type=submit]').removeClass('btn-primary').addClass('btn-success').val('Adicione os Itens');
+    $('.form_etapa-1').delay(100).fadeIn(300) //esconder a transicao no form
+
+  });//fim do jquary.document
+</script>
+<style>
+  /*-- thema form_etapa-1*/
+  .form_etapa-1{
+    /*width: 650px !important;*/
+    margin-top: 17px;
+  }
+  .contage{
+    font-size: x-large;
+    border-radius: 22px;
+    background: beige;*/
+  }
+  .cor_Contage_ok{ 
+    background: #2DEC2A !important;
+  }
+  .cor_Contage_Edit{ 
+    background: #FFBC00 !important;
+  }
+  .fluxoVenda{
+    width: 143px;
+    float: left;
+    margin: 9px 20px;
+  }
+  .row blockquote{
+    float: left; 
+  }
+  .row{
+    border-bottom: 1px solid #E8E8E8;
+  }
+  .col-md-5{
+    padding-top: 11px;
+  }
+
+</style>
+
+<div class="container">
+  <div class="row"> 
+    <div class="fluxoVenda">
+      <span class="label contage cor_Contage_Edit">1</span>
+      <span class="label contage">2</span>
+      <span class="label contage">3</span>
+    </div>
+    <blockquote>
+      <p class="lead">Você esta no (1) de (3) passos para fechar a venda. 
+       {{if session.codigo_venda:}} 
+          {{=XML(" | Código: <kbd>%s</kbd>"%session.codigo_venda)}}
+       {{pass}}
+      </p>
+    </blockquote>
+  </div>
+  <div class="row">
+    <div class="col-md-7">
+      <div class="form_etapa-1 " style="display:none">
+        {{=form}}
+      </div> 
+    </div>
+    <div class="col-md-5">
+      <p class="lead">Para quem é a venda?</kbd></p>
+      <dl>
+        <dt>Registro da venda!</dt>
+        <dd>Registre o cliente e o representante dessa venda.</dd>
+      </dl>
+    </div>
+
+  </div>
+
+</div>
+
+
+ 

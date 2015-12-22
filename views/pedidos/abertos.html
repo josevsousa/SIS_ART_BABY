@@ -1,0 +1,89 @@
+{{extend 'layoutLojinha.html'}}
+<script>
+	$(document).ready(function(){
+		$('#dataTable').DataTable({
+	        "scrollX": true,
+	        // "order": [ 1, 'desc' ],
+	        "language": {
+	          "url": "{{=URL('static','js/tradutorTable.json')}}"
+	        } 
+	    });
+	    $('.cadastroFull').on('click', function(){
+	    	var cod = $(this).parent().parent().children('td')[0].textContent
+	    	var dataSolicitacao = $(this).parent().parent().children('td')[1].textContent
+			$(location).attr('href',"iten?menu=operacional&cod="+cod+"&dataSolicitacao="+dataSolicitacao);//redireciona a pagina
+	    });
+
+	    $('#finalizado').hide();
+
+	})
+</script>
+<style>
+	#dataTable tbody tr:hover{
+		cursor: pointer;
+	}	
+	span.at{
+	    padding: 4px 8px;
+	    margin-left: 6px;
+	    border-radius: 6px;	
+	    font-weight: 800;
+	    color: #fff;
+	}
+	span.atrazo_amarelo {
+	    background: #FFC800;
+	}	
+	span.atrazo_vermelho {
+	    background: #FF0000;
+	}	
+	span.atrazo_verde {
+	    background: #CCC;
+	}
+	#minhaTabela .glyphicon-ok {
+	    margin-left: 11px;
+	    color: #0CF34C;
+	}
+</style>
+
+<div id="minhaTabela" class="animated fadeIn" >
+	<h3>Lista de taréfas operacional [ <small>Separar os produtos da lista</small> ]</h3>
+	<table id="dataTable" class="table table-striped hover" cellspacing="0" width="100%" >
+		<thead>
+			<tr>
+				<th>Codigo Pedido</th>
+				<th>Data Solicitaçao</th>
+				<th>Status</th>
+				<th></th>
+			</tr>
+			<tbody>
+				{{from datetime import date}}
+				{{for pedido in pedidos:}}
+					<!-- pegar a data da solicitacao -->
+					{{if pedido.deletado != True:}}
+						<!-- date(2015,12,21)- date(2015,12,19) -->
+						{{if pedido.status_venda != 'OK':}}   
+							{{venda =  (pedido.dataVenda).strftime('%Y,%m,%d')
+							venda = venda.split(',')
+							atrazo = date.today() - date(int(venda[0]),int(venda[1]),int(venda[2]))
+							
+							if atrazo.days > 5:
+								atrazo = "<span class='at atrazo_vermelho'>%s</span>"%atrazo.days
+							else:
+								atrazo = "<span class='at atrazo_amarelo'>%s</span>"%atrazo.days
+								pass	
+							atrazo = XML(atrazo) }}
+						{{else:}}	
+						{{atrazo = XML("<span class='glyphicon glyphicon-ok'></span>")}}
+						{{pass}}	
+						<tr>
+							<td>{{=pedido.codigoVenda}}</td>
+							<td>{{=(pedido.dataVenda).strftime('%d/%m/%Y as %H:%M:%S')}}{{=atrazo}}</td>
+							<td>{{=pedido.status_venda}}</td>
+							<td><button type="button" class="btn btn-default btn-xs cadastroFull"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button></td>
+						</tr>
+							
+					{{pass}}					
+				{{pass}}
+			</tbody>
+		</thead>
+	</table>
+</div>

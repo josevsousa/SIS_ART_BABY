@@ -1,0 +1,54 @@
+{{extend 'layoutLojinha.html'}}
+
+
+	<h2>Representante <small> ( dados de cadastro )</small></h2>
+	<hr>
+	<div class="row">
+		<div class="col-md-6">
+			<ul class="list-group">
+			  <li class="list-group-item"><strong>Apelido : </strong> {{=table[0].apelido}}</li>
+			  <li class="list-group-item"><strong>Nome : </strong> {{=table[0].nome}}</li>
+			  <li class="list-group-item"><strong>CNPJ : </strong> {{=table[0].cnpj}}</li>
+			  <li class="list-group-item"><strong>INSC : </strong> {{=table[0].insc}}</li>
+			  <li class="list-group-item"><strong>Celular 1 : </strong> {{=table[0].celular}} - {{=table[0].operadora}}</li>
+			  <li class="list-group-item"><strong>Celular 2 : </strong> {{=table[0].celular_2}} - {{=table[0].operadora_2}}</li>
+			  <li class="list-group-item"><strong>Tel Fixo : </strong> {{=table[0].fixo}}</li>
+			  <li class="list-group-item"><strong>E-mail : </strong> {{=table[0].email}}</li>
+			  <li class="list-group-item"><strong>Endereço : </strong> {{=table[0].endereco}}</li>
+			  <li class="list-group-item"><strong>Número : </strong> {{=table[0].numero}}</li>
+			  <li class="list-group-item"><strong>Cidade : </strong> {{=table[0].cidade}}</li>
+			  <li class="list-group-item"><strong>UF : </strong> {{=table[0].uf}}</li>
+			  <li class="list-group-item"><strong>Bairro : </strong> {{=table[0].bairro}}</li>
+			  <li class="list-group-item"><strong>Cep : </strong> {{=table[0].cep}}</li>
+			  <li class="list-group-item"><strong>Data do cadastro : </strong> {{=table[0].dataGravado}}</li>
+			</ul>
+			<nav>
+			  <ul class="pager">
+			    <li class="previous"><a href="{{=URL('representantes','listarRepresentantes?menu=representantes')}}"><span aria-hidden="true">&larr;</span> voltar</a></li>
+			    <!-- <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li> -->
+			  </ul>
+			</nav>
+		</div>
+		<div class="col-md-6" style="text-align:center">
+	  	{{if table[0].foto_representante:}}
+			{{=IMG(_src=URL('default','download',args=table[0].foto_representante),_class="img-rounded thumbnail fotoView",_width="400px")}}
+	  	{{else:}}
+			{{=IMG(_src=URL('static','images/notImage.png'))}}
+	  	{{pass}}
+		</div>
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

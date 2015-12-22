@@ -1,0 +1,106 @@
+{{extend 'layoutLojinha.html'}}
+<script>
+	$(document).ready(function(){
+        $('#minhaTabela').DataTable({
+            "scrollX": true,
+            "order": [ 6, 'desc' ],
+            "language": {
+              "url": "{{=URL('static','js/tradutorTable.json')}}"
+            }
+            
+        }); 
+
+	    //=== DELETAR ITEN
+		$(".del").on('click',function(){
+			var c = confirm("Tem certeza que deseja deletar a Venda?")
+	      	if (c == true) {
+		        // var i = $(this).parent().parent().index(); //pega posicao da row
+		        var v = $(this).parent().parent()[0].children[0].textContent;//pega valor da celula 4 da row
+		        console.log(v);
+		        // $("#transitory").val(i+";"+v);//envia para o value do input
+		        $("#transitory").val(v);//envia para o value do input
+		        ajax('excluirVendaRegistrada',['transitory']);//chama funcao do python
+		        $(location).attr('href',"historico?menu=caixa");//redireciona a pagina
+	      	}else{
+		        console.log("Registro mantido!")
+		    };			
+		});
+
+		//=== BUSCAR REGISTRO
+		$('#minhaTabela').on('dblclick','tr', function(){
+			var cod = this.children[0].textContent;
+			$(location).attr('href',"historico_print?menu=caixa&cod="+cod);//redireciona a pagina
+		});
+	    
+	})
+</script>
+<style>
+	.no-select {
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		-o-user-select: none;
+		user-select: none;
+	}
+
+	#transitory, .btD {display:none;}
+	.dest{color:#9E1818;}	
+	#dataTable tbody tr:hover{
+		cursor: pointer;
+	}
+	.r{margin-bottom: 10px;}
+	tr{cursor:pointer;}
+	.btDD a.del {
+    	margin-left: -2px !important;
+	}
+	#minhaTabela tbody tr:first-child{
+		background-color: #E9FFEA;
+	}
+
+
+</style>
+
+<input type="text" id="transitory" name="transitory">
+<div class="animated fadeInDown">
+<div class="row">
+	
+</div>
+<h2>Histórico das vendas <small> em destaque o ultimo resgistro!</small></h2>
+<hr>
+<!-- table -->
+<table id="minhaTabela" class="table hover" cellspacing="0" width="100%" >
+<thead>
+	<tr>
+		<th>Codigo</th>
+		<th>Representante</th>
+		<th>Tipo</th>
+		<th>Valor pago</th>
+		<th>Desconto</th>
+		<th>Cliente</th>
+		<th>Data Venda</th>
+		<th></th>
+	</tr> 
+	<tbody>
+		{{for venda in formListar:}}
+			{{if venda.deletado == False:}}
+				<tr>
+					<td>{{=venda.codigoVenda}}</td>
+					<td>{{=venda.representante}}</td>
+					<td>{{=venda.tipoVenda}}</td>
+					<td>{{="R$ %.2f"%float(venda.valorVenda)}}</td>
+					<td>{{="R$ %.2f"%float(venda.valorDesconto)}}</td>
+					<td>{{=venda.clienteEmail}}</td>
+					<td>{{=venda.dataVenda}}</td>
+					<td class="btDD">
+						<a class="btn btn-default del btn-xs" href="#"><span class="glyphicon glyphicon-remove"></span></a>
+					</td>
+				</tr>
+			{{pass}}		
+		{{pass}}			
+	</tbody>
+</thead>
+</table>
+</div>
+

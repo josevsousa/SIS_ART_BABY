@@ -50,6 +50,7 @@
 	<table id="dataTable" class="table table-striped hover" cellspacing="0" width="100%" >
 		<thead>
 			<tr>
+				<th>Tipo do cliente</th>
 				<th>Nome do Cliente</th>
 				<th>Celular</th>
 				<th>Email</th>
@@ -58,6 +59,7 @@
 			<tbody>
 			{{for cliente in formListar:}}
 			<tr>
+				<td>{{=cliente.clientes.tipo}}</td>
 				<td>{{=cliente.clientes.nome}}</td>
 				<td>{{=cliente.clientes.celular}} : {{=cliente.clientes.operadora}}</td>
 				<td>{{=cliente.clientes.email}}</td>

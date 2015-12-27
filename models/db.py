@@ -126,8 +126,39 @@ db.produtos.codigo_produto.requires = IS_NOT_IN_DB(db, db.produtos.codigo_produt
 
 OPERADORA = (' - ','TIM','OI','VIVO','CLARO','FIXO','NENHUMA')
 UF = ( " - ","AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RO", "RS", "RR", "SC", "SE", "SP", "TO" )
+TIPO = ('Pessoa_física','Pessoa_jurídica')
+CATEGORIA = ('cliente','fornecedor','funcionario')
+
+
+
+Cadastros = db.define_table('cadastros',
+    Field('tipo'),
+    Field('categoria'),
+    Field('nome'),
+    Field('cpf', label='CPF'),
+    Field('e_mail',label='E-mail'),
+    Field('telefones',"list:string"),
+    Field('celulares',"list:string"),
+    Field('contato'),
+    Field('endereco'),
+    Field('num'),
+    Field('bairro'),
+    Field('cep'),
+    Field('uf', default=' - '),
+    Field('cidade'),
+    Field('descricao'),
+    Field('data_gravado','datetime', default=request.now, label="Data"),
+    Field('foto','upload', label='Foto')
+    )
+Cadastros.tipo.requires = IS_IN_SET(TIPO, error_message="Tipo inválido!!!") 
+Cadastros.uf.requires = IS_IN_SET(UF, error_message="UF inválido!!!")  
+Cadastros.categoria.requires = IS_IN_SET(CATEGORIA, error_message="Categoria inválida!!!") 
+
+
+
 
 Clientes = db.define_table('clientes',
+    Field('tipo'),
     Field('nome',label='Nome'), 
     Field('apelido', label='Apelido'),
     Field('celular', label='Cel.'),
@@ -135,7 +166,7 @@ Clientes = db.define_table('clientes',
     Field('fixo', label='Tel.'),
     Field('email',label='E-mail'),
     Field('cnpj', label='CNPJ'),
-    Field('cpf', label='CPF', default=' - '),
+    Field('cpf', label='CPF'),
     Field('insc', label='INSC'),
     Field('cep', label='CEP'),
     Field('endereco', label='Endereço'),
@@ -150,6 +181,7 @@ Clientes = db.define_table('clientes',
 db.clientes.nome.requires = IS_NOT_IN_DB(db, db.clientes.nome, error_message = 'Usuario invalido')
 db.clientes.uf.requires = IS_IN_SET(UF, error_message="UF invalido!!!")
 db.clientes.operadora.requires = IS_IN_SET(OPERADORA, error_message="Operadora invalida!!!")
+db.clientes.tipo.requires = IS_IN_SET(TIPO, error_message="Tipo inválido!!!") 
 
 Funcionarios = db.define_table('funcionarios',
     Field('matricula', label='Matrícula'),
